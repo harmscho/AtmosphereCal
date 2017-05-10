@@ -1,15 +1,20 @@
-objects: Atmosphere.h Atmosphere.cc
-	clang -c -fPIC Atmosphere.cc -o Atmosphere.o
+CXX=g++
+INC=../include
+SRC=../src
+SRC_EXE=../src_exe
 
-all: objects
-	clang -shared -Wl,-headerpad_max_install_names,-undefined,dynamic_lookup,-install_name,/Users/harmscho/OwnLibs/Atmosphere/lib/libAtmosphere.so -o libAtmosphere.so Atmosphere.o
+all: objects lib tester
+
+lib: objects lib
+	$(CXX) -shared -o libAtmosphere.so Atmosphere.o
+
+objects: $(INC)/Atmosphere.h $(SRC)/Atmosphere.cc
+	$(CXX) -c -fPIC $(SRC)/Atmosphere.cc -I$(INC) -o Atmosphere.o
 
 install: all
-	mv *.so ../lib/
-	cp *.h ../include/
 
 clean:
-	rm -f *.o *.dylib a.out tester
+	rm -f *.o *.so a.out tester
 
-tester: tester.cc install
-	g++ tester.cc -o tester -m64 -L/Users/harmscho/OwnLibs/Atmosphere/lib -lAtmosphere -I/Users/harmscho/OwnLibs/Atmosphere/include
+tester: $(SRC_EXE)/tester.cc
+	$(CXX) $(SRC_EXE)/tester.cc -o tester -m64 -L./ -lAtmosphere -I$(INC)
